@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-Game: Thử Thách Chiếm Lĩnh Không Gian Mạng</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0f2fe, #f0fdf4);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #334155;
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(148, 163, 184, 0.15);
+            padding: 35px;
+            width: 90%;
+            max-width: 650px;
+        }
+
+        h1.main-title {
+            font-size: 24px;
+            color: #0284c7;
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .sub-title {
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .rule-card {
+            background-color: #f8fafc;
+            border-left: 5px solid #0ea5e9;
+            padding: 15px 20px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 25px;
+        }
+
+        .rule-card h3 {
+            color: #0f172a;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .rule-card ul {
+            list-style-type: none;
+        }
+
+        .rule-card li {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #475569;
+            position: relative;
+            padding-left: 20px;
+            line-height: 1.4;
+        }
+
+        .rule-card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .input-group input {
+            padding: 14px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+        }
+
+        .btn-start {
+            width: 100%;
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-start:hover {
+            background-color: #0284c7;
+            transform: translateY(-1px);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+        }
+
+        .user-info {
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .timer-box {
+            background-color: #fff1f2;
+            color: #f43f5e;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 15px;
+            border: 1px solid #fecdd3;
+        }
+
+        .question-text {
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-option {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #475569;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .btn-option:hover {
+            background-color: #e0f2fe;
+            border-color: #7dd3fc;
+            color: #0369a1;
+        }
+
+        .btn-option.correct {
+            background-color: #dcfce7 !important;
+            border-color: #4ade80 !important;
+            color: #15803d !important;
+        }
+
+        .btn-option.wrong {
+            background-color: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #b91c1c !important;
+        }
+
+        .game-footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress {
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .btn-next {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .result-screen {
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 26px;
+            color: #0ea5e9;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .result-score {
+            font-size: 54px;
+            font-weight: 800;
+            color: #10b981;
+            margin: 15px 0;
+        }
+
+        .btn-retry {
+            background-color: #14b8a6;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+
+        .btn-retry:hover {
+            background-color: #0d9488;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1 class="main-title">Trò Chơi Khảo Sát</h1>
+        <div class="sub-title">Mini-Game: Thử Thách Chiếm Lĩnh Không Gian Mạng</div>
+
+        <!-- MÀN HÌNH ĐĂNG NHẬP / LUẬT CHƠI -->
+        <div id="auth-screen">
+            <div class="rule-card">
+                <h3>📌 LUẬT CHƠI & QUY ĐỊNH:</h3>
+                <ul>
+                    <li><strong>Cơ cấu điểm số:</strong> Bài thi gồm 5 câu hỏi trắc nghiệm khách quan. Mỗi câu trả lời đúng trị giá cộng 20 điểm. Tổng điểm tối đa: 100 điểm.</li>
+                    <li><strong>Bắt buộc ghi tên:</strong> Học sinh cần điền chính xác họ tên của mình vào hệ thống trước khi nhấn bắt đầu.</li>
+                    <li><strong>Giới hạn thời gian:</strong> Tổng thời gian làm bài tối đa là 5 phút. Đồng hồ đếm ngược tự động chạy.</li>
+                </ul>
+            </div>
+
+            <div class="input-group">
+                <label for="username">Nhập họ và tên của bạn:</label>
+                <input type="text" id="username" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="off">
+            </div>
+            <button class="btn-start" onclick="validateAndStart()">BẮT ĐẦU LÀM BÀI</button>
+        </div>
+
+        <!-- MÀN HÌNH CHƠI GAME -->
+        <div id="quiz-screen" style="display: none;">
+            <div class="game-header">
+                <div class="user-info">Sĩ tử: <span id="display-name" style="color: #0ea5e9;"></span></div>
+                <div class="timer-box">⏱️ <span id="timer">05:00</span></div>
+            </div>
+            <div class="question-text" id="question">Đang tải câu hỏi...</div>
+            <div class="options-container" id="options"></div>
+            <div class="game-footer">
+                <div class="progress" id="progress">Câu hỏi 1/5</div>
+                <button class="btn-next" id="next-btn" onclick="nextQuestion()">Tiếp theo</button>
+            </div>
+        </div>
+
+        <!-- MÀN HÌNH KẾT QUẢ -->
+        <div id="result-screen" class="result-screen" style="display: none;">
+            <div class="result-title">🎉 ĐÃ HOÀN THÀNH BÀI THI 🎉</div>
+            <div style="font-size: 16px; color: #475569;">Thí sinh: <strong id="res-name"></strong></div>
+            <div class="result-score" id="final-score">0 điểm</div>
+            <p id="result-comment" style="color: #64748b; font-weight: 500;"></p>
+            <button class="btn-retry" onclick="resetGame()">Làm lại bài</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Câu 1: Hành vi nào dưới đây được coi là biểu hiện rõ ràng nhất của hội chứng 'Nghiện Game/Mạng xã hội'?",
+                options: [
+                    "A. Sử dụng mạng xã hội khoảng 45 phút mỗi ngày để nhắn tin học nhóm.",
+                    "B. Cảm thấy bồn chồn, cáu gắt khi bị ngắt kết nối mạng, bỏ bê học tập và các hoạt động thể chất.",
+                    "C. Tải một tựa game mới về máy tính theo giới thiệu của bạn cùng lớp.",
+                    "D. Chia sẻ một bài viết truyền cảm hứng về bảo vệ môi trường lên trang cá nhân."
+                ],
+                answer: 1
+            },
+            {
+                question: "Câu 2: Chữ 'H' trong bộ quy tắc T.H.I.N.K nhắc nhở chúng ta điều gì trước khi đăng tải bài viết hoặc bình luận?",
+                options: [
+                    "A. Câu từ đó có hài hước (Humorous) không?",
+                    "B. Nội dung đó có hợp pháp (Honest) không?",
+                    "C. Lời bình luận đó có gây tổn thương, xúc phạm (Hurtful) đến người khác không?",
+                    "D. Bài viết đó có mang lại lợi ích kinh tế (High-return) không?"
+                ],
+                answer: 2
+            },
+            {
+                question: "Câu 3: Khi một người lạ quen qua game online yêu cầu bạn cung cấp địa chỉ nhà riêng và số điện thoại, cách xử lý khôn ngoan nhất là gì?",
+                options: [
+                    "A. Cung cấp ngay lập tức vì họ đã cùng phe gánh đội (leo rank) rất nhiệt tình.",
+                    "B. Cho địa chỉ giả để trêu đùa lại người đó.",
+                    "C. Từ chối khéo léo, tuyệt đối giữ bí mật thông tin cá nhân và báo cáo với cha mẹ/thầy cô.",
+                    "D. Hẹn người đó gặp mặt trực tiếp tại một địa điểm vắng người để trò chuyện."
+                ],
+                answer: 2
+            },
+            {
+                question: "Câu 4: Theo quy tắc sức khỏe học đường 20-20-20, sau 20 phút nhìn liên tục vào màn hình điện tử, em cần làm gì?",
+                options: [
+                    "A. Đứng dậy tập thể dục mạnh trong vòng 20 phút.",
+                    "B. Nhắm mắt nghỉ ngơi hoàn toàn hoặc nhìn ra xa khoảng 6 mét trong vòng 20 giây.",
+                    "C. Chuyển sang chơi một trò chơi khác trên điện thoại trong 20 phút.",
+                    "D. Tắt máy tính và đi ngủ ngay lập tức."
+                ],
+                answer: 1
+            },
+            {
+                question: "Câu 5: Nếu phát hiện thông tin tài khoản mạng xã hội của mình bị người lạ hack và gửi tin nhắn lừa đảo mượn tiền bạn bè, hành động đầu tiên cần làm là gì?",
+                options: [
+                    "A. Giữ im lặng và tạo một tài khoản mới để tiếp tục sử dụng.",
+                    "B. Khẩn cấp tìm cách thông báo qua các kênh khác (gọi điện, gặp trực tiếp) để bạn bè cảnh giác, đồng thời báo cáo với nhà mạng/người lớn.",
+                    "C. Chửi bới người đã đăng nhập trái phép trên dòng thời gian công khai.",
+                    "D. Chấp nhận mất tài khoản và không làm gì cả."
+                ],
+                answer: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+        let timerInterval;
+        let totalTime = 300; 
+        let currentUserName = "";
+
+        function validateAndStart() {
+            const nameInput = document.getElementById('username').value.trim();
+            if (nameInput === "") {
+                alert("Vui lòng điền chính xác Họ và Tên của bạn trước khi bắt đầu!");
+                return;
+            }
+            
+            currentUserName = nameInput;
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            document.getElementById('display-name').innerText = currentUserName;
+
+            totalTime = 300;
+            currentQuestionIndex = 0;
+            score = 0;
+            startTimer();
+            showQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (totalTime <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Hết giờ làm bài! Hệ thống tự động nộp bài.");
+                    showResult();
+                } else {
+                    totalTime--;
+                    let minutes = Math.floor(totalTime / 60);
+                    let seconds = totalTime % 60;
+                    document.getElementById('timer').innerText = 
+                        `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
+            }, 1000);
+        }
+
+        function showQuestion() {
+            answered = false;
+            document.getElementById('next-btn').style.display = 'none';
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            let currentQuestion = quizData[currentQuestionIndex];
+            document.getElementById('question').innerText = currentQuestion.question;
+            document.getElementById('progress').innerText = `Câu hỏi ${currentQuestionIndex + 1}/${quizData.length}`;
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add('btn-option');
+                button.addEventListener('click', () => selectOption(button, index));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectOption(selectedButton, index) {
+            if (answered) return;
+            answered = true;
+
+            let correctAnswerIndex = quizData[currentQuestionIndex].answer;
+            const buttons = document.getElementById('options').querySelectorAll('.btn-option');
+
+            if (index === correctAnswerIndex) {
+                selectedButton.classList.add('correct');
+                score += 20;
+            } else {
+                selectedButton.classList.add('wrong');
+                buttons[correctAnswerIndex].classList.add('correct');
+            }
+
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                showQuestion();
+            } else {
+                clearInterval(timerInterval);
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            
+            document.getElementById('res-name').innerText = currentUserName;
+            document.getElementById('final-score').innerText = `${score} / 100 Điểm`;
+
+            let comment = "";
+            if(score === 100) comment = "Xuất sắc! Bạn xứng đáng là Thủ lĩnh bảo mật không gian mạng.";
+            else if(score >= 60) comment = "Rất tốt! Bạn nắm vững các kiến thức an toàn cốt lõi.";
+            else comment = "Bạn cần lưu ý và nâng cao kiến thức bảo mật hơn để bảo vệ chính mình nhé.";
+            
+            document.getElementById('result-comment').innerText = comment;
+        }
+
+        function resetGame() {
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'block';
+            document.getElementById('username').value = "";
+        }
+    </script>
+</body>
+</html>
